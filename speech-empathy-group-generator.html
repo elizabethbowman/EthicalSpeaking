@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empathy + Ethical Speaking Group Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #f7f3ee;
+    --ink: #1a1714;
+    --muted: #6b6460;
+    --border: #ddd8d2;
+    --accent: #c4500a;
+    --accent-light: #f5e8df;
+    --card-bg: #ffffff;
+    --tag-bg: #eee9e3;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 2.5rem 1.5rem;
+    font-size: 16px;
+  }
+
+  .page-header {
+    max-width: 860px;
+    margin: 0 auto 2.5rem;
+  }
+
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 0.6rem;
+  }
+
+  .page-header h1 em {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .page-header p {
+    font-size: 0.9rem; /* ~14.4px */
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 560px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: start;
+  }
+
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: sticky;
+    top: 1.5rem;
+  }
+
+  .sidebar h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 1.25rem;
+    color: var(--ink);
+  }
+
+  .field-group {
+    margin-bottom: 1.2rem;
+  }
+
+  label {
+    display: block;
+    font-size: 0.8rem; /* ~12.8px */
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.45rem;
+  }
+
+  textarea, input[type="number"] {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; /* ~14.4px */
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 0.75rem;
+    color: var(--ink);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  textarea:focus, input[type="number"]:focus {
+    border-color: var(--accent);
+  }
+
+  textarea { min-height: 200px; line-height: 1.6; }
+  input[type="number"] { max-width: 90px; }
+
+  .btn-row {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+  }
+
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem; /* 14px */
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 0.55rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #a83f06; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { background: var(--tag-bg); }
+
+  .how-to {
+    margin-top: 1.4rem;
+    background: var(--accent-light);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    font-size: 0.85rem; /* ~13.6px */
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .how-to strong { display: block; margin-bottom: 0.4rem; font-size: 0.875rem; }
+  .how-to ol { padding-left: 1.2rem; }
+  .how-to li { margin-bottom: 0.25rem; }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .stat { text-align: center; flex: 1; }
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .stat-lbl {
+    font-size: 0.8rem; /* ~12.8px */
+    color: var(--muted);
+    margin-top: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* GROUP CARDS */
+  .groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+  }
+
+  .group-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    animation: fadeUp 0.3s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .group-card:nth-child(2) { animation-delay: 0.05s; }
+  .group-card:nth-child(3) { animation-delay: 0.1s; }
+  .group-card:nth-child(4) { animation-delay: 0.15s; }
+  .group-card:nth-child(5) { animation-delay: 0.2s; }
+  .group-card:nth-child(6) { animation-delay: 0.25s; }
+
+  .group-header {
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .group-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+  }
+
+  .group-badge {
+    font-size: 0.8rem; /* ~12.8px */
+    font-weight: 600;
+    background: var(--tag-bg);
+    color: var(--muted);
+    border-radius: 20px;
+    padding: 0.2rem 0.65rem;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .audience-block {
+    margin: 0.75rem 1.25rem;
+    background: var(--accent-light);
+    border-radius: 10px;
+    padding: 0.8rem;
+  }
+
+  .audience-theme {
+    font-size: 0.8rem; /* ~12.8px */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .audience-item {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.55;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+  }
+  .audience-item:last-child { margin-bottom: 0; }
+  .audience-label {
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .students-list {
+    padding: 0 1.25rem 1.25rem;
+  }
+
+  .student-row {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.7rem 0.85rem;
+    margin-top: 0.6rem;
+    background: var(--cream);
+  }
+
+  .student-name {
+    font-weight: 600;
+    font-size: 0.95rem; /* ~15.2px */
+    margin-bottom: 0.3rem;
+  }
+
+  .student-position {
+    font-size: 0.875rem; /* 14px */
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .hint {
+    font-size: 0.8rem; /* ~12.8px */
+    color: var(--muted);
+    margin-top: 0.35rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Empathy + <em>Ethical Speaking</em><br>Group Generator</h1>
+  <p>Generate a unique position statement for each student, then group them to share contrasting audiences for the harm-awareness adaptation activity.</p>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Class Setup</h2>
+
+    <div class="field-group">
+      <label>Student names (one per line)</label>
+      <textarea id="studentInput">Alex
+Jordan
+Taylor
+Sam
+Casey
+Morgan
+Riley
+Avery
+Parker
+Quinn
+Jamie
+Drew</textarea>
+    </div>
+
+    <div class="field-group">
+      <label>Max group size</label>
+      <input type="number" id="groupSize" value="4" min="3" max="6">
+      <p class="hint">Groups of 3–4. Sizes are balanced automatically.</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="regenerate()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+        Regenerate
+      </button>
+      <button class="btn-outline" onclick="exportTxt()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export TXT
+      </button>
+    </div>
+
+    <div class="how-to">
+      <strong>How to use</strong>
+      <ol>
+        <li>Paste your class roster.</li>
+        <li>Click <b>Regenerate</b> until you like the mix.</li>
+        <li>Each student gets an individual position statement.</li>
+        <li>Students in the same group share two contrasting audiences for the next phase.</li>
+      </ol>
+    </div>
+  </aside>
+
+  <main>
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-num" id="statStudents">12</div>
+        <div class="stat-lbl">Students</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="statGroups">3</div>
+        <div class="stat-lbl">Groups</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="statTarget">3–4</div>
+        <div class="stat-lbl">Group target</div>
+      </div>
+    </div>
+
+    <div class="groups-grid" id="groupsGrid"></div>
+  </main>
+</div>
+
+<script>
+const POSITION_POOL = [
+  "Public colleges should offer tuition-free education for students from low- and middle-income families.",
+  "Cities should expand public transit even when it requires higher local taxes.",
+  "Social media companies should remove false or misleading political content more aggressively.",
+  "The federal minimum wage should be raised nationwide.",
+  "Student loan forgiveness should be expanded for borrowers with the greatest financial need.",
+  "Local governments should invest more in affordable housing, even if some neighborhoods change.",
+  "Employers should be required to provide paid family leave.",
+  "States should limit the use of facial recognition technology in public spaces.",
+  "Schools and colleges should restrict the use of generative AI in graded coursework.",
+  "Communities should prioritize climate resilience projects over some other infrastructure spending.",
+  "The United States should reduce cash bail for nonviolent offenses.",
+  "Hospitals should be required to publish clearer and more accessible pricing information.",
+  "States should make Election Day a state holiday to increase voter participation.",
+  "Local governments should place stronger limits on short-term rentals to protect housing access.",
+  "Colleges should require a civic dialogue course focused on disagreement across differences.",
+  "The government should regulate data collection by apps more strictly.",
+  "Public schools should provide free breakfast and lunch to every student.",
+  "Communities should create more supervised safe-use strategies to reduce overdose deaths.",
+  "States should increase funding for mental health care even if it requires budget tradeoffs.",
+  "Large employers should be more transparent about pay ranges in job postings.",
+  "Cities should reduce car traffic downtown to create more pedestrian-friendly spaces.",
+  "The federal government should invest more in job training than in four-year degree expansion.",
+  "Colleges should guarantee basic-needs support for students facing food or housing insecurity.",
+  "News organizations should label AI-generated content clearly and prominently.",
+  "Communities should expand broadband access as a public necessity, even in high-cost rural areas.",
+  "The government should place stricter limits on prescription drug prices.",
+  "States should restore voting rights automatically after prison sentences are completed.",
+  "Universities should reduce legacy admissions in favor of broader access policies."
+];
+
+const AUDIENCE_PAIRS = [
+  { title: "Economic Security vs Tax Burden", audiences: ["A low-income parent working multiple jobs and worrying about housing, food, and childcare costs.", "A high-income taxpayer who values limited government spending and worries about inefficiency."] },
+  { title: "Rural Traditionalist vs Urban Progressive", audiences: ["A politically conservative rural resident who values tradition, local control, and skepticism of rapid change.", "A politically progressive urban resident who values equity, reform, and collective responsibility."] },
+  { title: "Small Business vs Labor Advocate", audiences: ["A small business owner concerned about regulations, payroll pressure, and staying competitive.", "A worker-rights advocate focused on fair pay, safety, and power imbalances in the workplace."] },
+  { title: "First-Generation Student vs Affluent Professional", audiences: ["A first-generation college student balancing classes, work, and family obligations with limited financial cushion.", "An affluent professional who values merit, efficiency, and personal responsibility."] },
+  { title: "Government Skeptic vs Public Systems Supporter", audiences: ["A person who distrusts government institutions and worries about overreach.", "A person who believes public institutions are necessary for fairness and social stability."] },
+  { title: "Recent Layoff vs Tech Professional", audiences: ["A recently laid-off worker who feels economically vulnerable and uncertain about the future.", "A financially stable tech professional who prioritizes innovation and long-term growth."] },
+  { title: "Community Stability vs Social Change", audiences: ["A homeowner focused on neighborhood stability, predictability, and property values.", "A community organizer focused on access, inclusion, and correcting systemic inequities."] },
+  { title: "Immigrant Family vs Native-Born Taxpayer", audiences: ["A recent immigrant family navigating unfamiliar systems and seeking opportunity and dignity.", "A native-born taxpayer concerned about fairness, resource allocation, and social cohesion."] }
+];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildGroups(names, maxSize) {
+  const shuffled = shuffle(names);
+  const total = shuffled.length;
+  if (!total) return [];
+  let groupCount = Math.ceil(total / maxSize);
+  while (groupCount > 1 && total / groupCount < 3) groupCount--;
+  const baseSize = Math.floor(total / groupCount);
+  let rem = total % groupCount;
+  const sizes = Array.from({ length: groupCount }, () => {
+    if (rem > 0) { rem--; return baseSize + 1; }
+    return baseSize;
+  });
+  const groups = [];
+  let idx = 0;
+  sizes.forEach((size, i) => {
+    groups.push({ groupNumber: i + 1, students: shuffled.slice(idx, idx + size) });
+    idx += size;
+  });
+  return groups;
+}
+
+let currentData = [];
+
+function regenerate() {
+  const raw = document.getElementById('studentInput').value;
+  const names = raw.split('\n').map(s => s.trim()).filter(Boolean);
+  const maxSize = Math.max(3, parseInt(document.getElementById('groupSize').value) || 4);
+
+  document.getElementById('statStudents').textContent = names.length;
+  document.getElementById('statTarget').textContent = '3\u2013' + maxSize;
+
+  const grid = document.getElementById('groupsGrid');
+
+  if (!names.length) {
+    grid.innerHTML = '<p style="color:var(--muted);font-size:0.875rem;">No students found. Add names above.</p>';
+    document.getElementById('statGroups').textContent = 0;
+    return;
+  }
+
+  const groups = buildGroups(names, maxSize);
+  const shuffledPairs = shuffle(AUDIENCE_PAIRS);
+  const shuffledPositions = shuffle(POSITION_POOL);
+  const posMap = {};
+  names.forEach((n, i) => posMap[n] = shuffledPositions[i % shuffledPositions.length]);
+
+  currentData = groups.map((g, i) => ({
+    ...g,
+    pair: shuffledPairs[i % shuffledPairs.length],
+    students: g.students.map(name => ({ name, position: posMap[name] }))
+  }));
+
+  document.getElementById('statGroups').textContent = currentData.length;
+  renderGroups();
+}
+
+function renderGroups() {
+  const grid = document.getElementById('groupsGrid');
+  grid.innerHTML = '';
+  currentData.forEach(group => {
+    const card = document.createElement('div');
+    card.className = 'group-card';
+    card.innerHTML = `
+      <div class="group-header">
+        <div class="group-title">Group ${group.groupNumber}</div>
+        <span class="group-badge">&#128101; ${group.students.length} students</span>
+      </div>
+      <div class="audience-block">
+        <div class="audience-theme">${group.pair.title}</div>
+        <div class="audience-item"><span class="audience-label">Audience A:</span> ${group.pair.audiences[0]}</div>
+        <div class="audience-item"><span class="audience-label">Audience B:</span> ${group.pair.audiences[1]}</div>
+      </div>
+      <div class="students-list">
+        ${group.students.map(s => `
+          <div class="student-row">
+            <div class="student-name">${s.name}</div>
+            <div class="student-position">${s.position}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function exportTxt() {
+  if (!currentData.length) return;
+  const lines = [];
+  currentData.forEach(g => {
+    lines.push('GROUP ' + g.groupNumber);
+    lines.push('Audience Pair Theme: ' + g.pair.title);
+    lines.push('Audience A: ' + g.pair.audiences[0]);
+    lines.push('Audience B: ' + g.pair.audiences[1]);
+    lines.push('');
+    g.students.forEach(s => lines.push(s.name + ': ' + s.position));
+    lines.push('\n----------------------------------------\n');
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'speech-empathy-group-assignments.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Initial render
+regenerate();
+</script>
+</body>
+</html>
